@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<!-- 定义数据源的信息 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property name="jdbcUrl">
+			<value>jdbc:mysql://localhost:3306/project?useSSL=true</value>
+		</property>
+		<property name="user">
+			<value>root</value>
+		</property>
+		<property name="password">
+			<value>root</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>80</value>
+		</property>
+		<property name="minPoolSize">
+			<value>1</value>
+		</property>
+		<property name="initialPoolSize">
+			<value>1</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>20</value>
+		</property>
+	</bean>
+
+	<!--定义Hibernate的SessionFactory -->
+	<!-- SessionFactory使用的数据源为上面的数据源 -->
+	<!-- 指定了Hibernate的映射文件和配置信息 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+		<property name="mappingResources">
+			<list>
+				<value>com/ynwi/ssh/beans/User.hbm.xml</value>
+				<value>com/ynwi/ssh/beans/Excuse.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="show_sql">true</prop>
+				<prop key="hibernate.jdbc.batch_size">20</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="baseDao" class="com.ynwi.ssh.daoImpl.UserDao">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<!-- 分页Dao测试 -->
+	<bean id="memberDao" class="com.ynwi.ssh.daoImpl.MemberDaoImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<!--业务逻辑类 -->
+	<bean id="userManager" class="com.ynwi.ssh.serviceImpl.UserManagerImpl">
+		<property name="dao">
+			<ref bean="baseDao" />
+		</property>
+		<property name="memberDao">
+			<ref bean="memberDao" />
+		</property>
+	</bean>
+	
+	<!-- Link Action -->
+	<bean id="linkAction" class="com.vaannila.action.LinkAction">
+		<property name="userManager">
+			<ref bean="userManager" />
+		</property>
+	</bean>
+
+	<!-- User Action -->
+	<bean id="userAction" class="com.ynwi.ssh.action.UserAction">
+		<property name="userManager">
+			<ref bean="userManager" />
+		</property>
+	</bean>
+
+
+	<!-- Excuse Action -->
+	<bean id="ExcuseAction" class="com.ynwi.ssh.action.ExcuseAction">
+		<property name="userManager">
+			<ref bean="userManager" />
+		</property>
+		<property name="sendMail">
+			<ref bean="sendMail" />
+		</property>
+	</bean>
+
+	<!-- Email Server -->
+	<!-- ******************************** 以下为邮件自动发送示例的配置 ********************************** -->
+
+	<!-- mailSender -->
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">  
+         <property name="host" value="smtp.sohu.com" />  
+         <property name="port" value="25" />  
+         <property name="username" value="swd466@sohu.com" />  
+         <property name="password" value="king660425" />  
+         <property name="javaMailProperties">  
+             <props>  
+                 <prop key="mail.smtp.auth">true</prop>  
+             </props>  
+         </property>  
+     </bean> 
+
+	<!-- 简单的message -->
+	<bean id="mailMessage" class="org.springframework.mail.SimpleMailMessage">
+		<property name="from">
+			<value>swd466@sohu.com</value>
+		</property>
+	</bean>
+
+	<!-- sendMail -->
+	<bean id="sendMail" class="com.ynwi.ssh.util.SendMail">
+		<property name="mailMessage">
+			<ref bean="mailMessage" />
+		</property>
+		<property name="mailSender">
+			<ref bean="mailSender" />
+		</property>
+	</bean>
+
+	<!-- more bean definitions go here -->
+
+
+</beans>

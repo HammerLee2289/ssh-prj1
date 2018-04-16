@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE struts PUBLIC  
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true"></constant>
+	<include file="struts-default.xml" />
+	<package name="ynwi" extends="struts-default">
+		<result-types>
+			<result-type name="tiles"
+				class="org.apache.struts2.views.tiles.TilesResult" />
+		</result-types>
+
+		<!-- 注册action -->
+		<action name="register" class="userAction" method="register">
+			<result name="input">/register.jsp</result>
+			<result name="success" type="redirectAction">showExcuse</result>
+			<result name="error">/fail.jsp</result>
+		</action>
+
+		<!-- 登录action -->
+		<action name="login" class="userAction" method="login">
+			<result name="input">/lo_gin.jsp</result>
+			<result name="success" type="redirectAction">showExcuse</result>
+			<result name="error">/fail.jsp</result>
+		</action>
+		
+		<!-- 更新User -->
+		<action name="updateUser" class="userAction" method="update">
+			<result name="success" type="redirectAction">userAccountLink</result>
+		</action>
+		
+		<!-- 查找User -->
+		<action name="findUserByName" class="userAction" method="findUserByName">
+			<result name="success">/userCard.jsp</result>
+		</action>
+		
+		<!-- 用户名查重 -->
+		<action name="checkUsername" class="userAction" method="checkUsername">
+			<result name="registPage">/regist.jsp</result> 
+		</action>
+
+		<!-- 新建excuse -->
+		<action name="newExcuse" class="ExcuseAction" method="newExcuse">
+			<result name="success" type="redirectAction">showExcuse?page=1</result>
+			<result name="error">/fail.jsp</result>
+		</action>
+
+		<!-- 显示结果 -->
+		<action name="showExcuse" class="ExcuseAction" method="showExcuse">
+			<result name="success" type="tiles">excuseDetail</result>
+			<result name="error">/index.jsp</result>
+		</action>
+
+		<!-- 显示员工请假申请 -->
+		<action name="findStuffExcuse" class="ExcuseAction" method="findStuffExcuse">
+			<result name="success" type="tiles">stuffExcuse</result>
+			<result name="error">/index.jsp</result>
+		</action>
+
+		<!-- 显示统计结果 -->
+		<action name="showExcuseSta" class="ExcuseAction" method="showExcuseSta">
+			<result name="success" type="tiles">excuseSta</result>
+			<result name="error">/index.jsp</result>
+		</action>
+
+		<!-- 同意员工请假 -->
+		<action name="agreeStuffExcuse" class="ExcuseAction" method="agreeStuffExcuse">
+			<result name="success" type="redirectAction">findStuffExcuse</result>
+			<result name="error">/index.jsp</result>
+		</action>
+
+		<!-- 删除员工请假 -->
+		<action name="deleteStuffExcuse" class="ExcuseAction" method="deleteStuffExcuse">
+			<result name="success" type="redirectAction">findStuffExcuse</result>
+			<result name="error">/index.jsp</result>
+		</action>
+
+		<!-- 删除excuse -->
+		<action name="deleteExcuse" class="ExcuseAction" method="deleteExcuse">
+			<result name="success" type="redirectAction">showExcuse</result>
+			<result name="error">/index.jsp</result>
+		</action>
+
+		<!-- 编辑excuse -->
+		<action name="editExcuse" class="ExcuseAction" method="editExcuse">
+			<result name="success" type="redirectAction">showExcuse?page=1</result>
+			<result name="error">/index.jsp</result>
+		</action>
+
+		<!-- 上传文件 Action -->
+		<action name="uploadPhoto" class="com.ynwi.ssh.action.UploadAction">
+			<result name="success" type="redirectAction">userAccountLink</result>
+			<result name="error">/register.jsp</result>
+		</action>
+
+		<!-- 导出detail excuse -->
+		<action name="exportExcuseDetail" class="ExcuseAction" method="exportExcuseDetail" />
+
+		<!-- 导出Sta excuse -->
+		<action name="exportExcuseSta" class="ExcuseAction" method="exportExcuseSta" />
+
+
+		<!-- 整合tiles -->
+
+		<action name="*Link" method="{1}" class="com.vaannila.action.LinkAction">
+			<result name="home" type="tiles">home</result>
+			<result name="faq" type="tiles">faq</result>
+			<result name="userAccount" type="tiles">userAccount</result>
+		</action>
+
+
+
+	</package>
+
+</struts>  
